@@ -14,6 +14,8 @@ import "../cStyles/register_login.css";
 const Register = () => {
   const navigate = useNavigate();
 
+ 
+ 
   const [user, setUser] = useState({
     name: "",
     username: "",
@@ -23,6 +25,21 @@ const Register = () => {
     password: "",
     reEnterPassword: "",
   });
+  const [email,setEmail] = useState("");
+
+  const [emailError, setEmailError] = useState(null);
+  const checkEmail = (email) => {
+    return /\S+@\S+\.\S+/.test(email);
+  };
+  const handleEmail = (e) => {
+    if (!checkEmail(e.target.value)) {
+      setEmailError("Email is not valid");
+    } else {
+      setEmailError(null);
+    }
+    setEmail(e.target.value);
+  };
+  const [name,setFirstName] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,11 +48,15 @@ const Register = () => {
       [name]: value,
     });
   };
+  const handleName = (e) => {
+    let result = e.target.value.replace(/[^a-z]/gi, "");
+    setFirstName(result);
+  };
+
 
   const register = (e) => {
     e.preventDefault();
-    const { name, username, gender, dob, email, password, reEnterPassword } =
-      user;
+    const { name, username, gender, dob, email, password, reEnterPassword }=useState ;
     if (
       name &&
       username &&
@@ -44,15 +65,19 @@ const Register = () => {
       email &&
       password &&
       password === reEnterPassword
-    ) {
+    )
+     {
       axios.post("http://localhost:3001/register", user).then((res) => {
         alert(res.data.message);
         navigate("/login");
       });
+      
     } else {
       alert("invlid input");
     }
+
   };
+  
 
   return (
     <>
@@ -94,9 +119,9 @@ const Register = () => {
                   <input
                     type="text"
                     name="name"
-                    value={user.name}
+                    value={name}
                     placeholder="Your Name"
-                    onChange={handleChange}
+                    onChange={handleName}
                   ></input>
                 </div>
               </div>
@@ -168,10 +193,11 @@ const Register = () => {
                   <input
                     type="text"
                     name="email"
-                    value={user.email}
+                    value={email}
                     placeholder="Your Email"
-                    onChange={handleChange}
+                    onChange={handleEmail}
                   />
+                  {emailError && <label className="Warning">{emailError}</label>}
                 </div>
               </div>
               <div className="inputDiv">
@@ -184,6 +210,16 @@ const Register = () => {
                     value={user.password}
                     placeholder="Set Password"
                     onChange={handleChange}
+                    validation={{
+                      required: {
+                        value: true,
+                        message: 'required',
+                      },
+                      minLength: {
+                        value: 6,
+                        message: 'min 6 characters',
+                      },
+                    }}
                   />
                 </div>
               </div>
